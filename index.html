@@ -143,20 +143,39 @@ const TRAINER  = "https://emalawi19-my-platform-trainer.hf.space";
 
 function connectBackend() {
   document.getElementById("load-error").style.display = "none";
-  document.querySelector(".loading-text").textContent = "Connecting to backend...";
+  const loadingText = document.querySelector(".loading-text");
+  loadingText.textContent = "Connecting to backend...";
   document.querySelector(".spinner").style.display = "block";
+  
   fetch(BACKEND + "/health")
-    .then(r => r.json())
+    .then(async (response) => {
+      // Fetch only rejects on network failures, not 404s or 500s. 
+      // We must check if the response is OK.
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
     .then(data => {
       if (data.status === "healthy") {
         document.getElementById("loading-screen").style.display = "none";
         loadDashboard();
         startPolling();
+      } else {
+        throw new Error("Backend connected, but status is not healthy.");
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error("Connection Failed:", error);
       document.querySelector(".spinner").style.display = "none";
-      document.querySelector(".loading-text").textContent = "Could not connect.";
+      loadingText.textContent = "Connection Failed.";
+      // Inject the actual error message into the DOM
+      document.querySelector(".conn-error").innerHTML = `
+        <strong>Error:</strong> ${error.message} <br><br>
+        Check the browser console (F12) for more details.
+        <br><br>
+        <button class="retry-btn" onclick="connectBackend()">Retry</button>
+      `;
       document.getElementById("load-error").style.display = "block";
     });
 }
