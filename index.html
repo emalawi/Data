@@ -10,25 +10,25 @@
   header { background: #1a1a2e; color: white; padding: 1rem 2rem; display: flex; align-items: center; gap: 12px; }
   header h1 { font-size: 1.2rem; font-weight: 600; }
   .badge { background: #534AB7; color: white; font-size: 11px; padding: 2px 8px; border-radius: 99px; }
-  nav { display: flex; gap: 4px; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e5e5e5; }
+  nav { display: flex; gap: 4px; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e5e5e5; flex-wrap: wrap; }
   nav button { padding: 6px 16px; border: 1px solid #e5e5e5; background: transparent; border-radius: 6px; cursor: pointer; font-size: 14px; color: #555; }
   nav button.active { background: #534AB7; color: white; border-color: #534AB7; }
-  .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  .page { display: none; padding: 1.5rem; max-width: 900px; margin: 0 auto; }
   .page.active { display: block; }
   .card { background: white; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
   .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
   label { font-size: 13px; color: #555; display: block; margin-bottom: 4px; margin-top: 12px; }
-  input, select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+  input, select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; color: #1a1a1a; }
   .btn { padding: 9px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; }
-  .btn-primary { background: #534AB7; color: white; margin-top: 1rem; }
+  .btn-primary { background: #534AB7; color: white; margin-top: 1rem; width: 100%; }
   .btn-primary:hover { background: #3C3489; }
-  .btn-danger { background: #e24b4a; color: white; }
-  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+  .btn-sm { padding: 6px 14px; font-size: 13px; background: #534AB7; color: white; border-radius: 6px; border: none; cursor: pointer; }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; white-space: nowrap; }
   .status-pending { background: #faeeda; color: #633806; }
   .status-training { background: #e6f1fb; color: #042C53; }
   .status-complete { background: #e1f5ee; color: #04342C; }
   .status-failed { background: #fcebeb; color: #501313; }
-  .run-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+  .run-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 12px; }
   .run-row:last-child { border-bottom: none; }
   .run-name { font-size: 14px; font-weight: 500; }
   .run-meta { font-size: 12px; color: #888; margin-top: 2px; }
@@ -36,30 +36,33 @@
   .alert-success { background: #e1f5ee; color: #04342C; }
   .alert-error { background: #fcebeb; color: #501313; }
   .alert-info { background: #e6f1fb; color: #042C53; }
-  .log-box { background: #1a1a2e; color: #9FE1CB; font-family: monospace; font-size: 12px; padding: 1rem; border-radius: 6px; max-height: 200px; overflow-y: auto; margin-top: 1rem; white-space: pre-wrap; }
-  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 1rem; }
-  .metric { background: #f5f5f5; border-radius: 8px; padding: 1rem; text-align: center; }
-  .metric-value { font-size: 22px; font-weight: 600; color: #534AB7; }
+  .log-box { background: #1a1a2e; color: #9FE1CB; font-family: monospace; font-size: 12px; padding: 1rem; border-radius: 6px; height: 220px; overflow-y: auto; margin-top: 1rem; white-space: pre-wrap; word-break: break-all; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+  .metric { background: white; border: 1px solid #e5e5e5; border-radius: 8px; padding: 1rem; text-align: center; }
+  .metric-value { font-size: 28px; font-weight: 600; color: #534AB7; }
   .metric-label { font-size: 12px; color: #888; margin-top: 4px; }
   .empty { text-align: center; color: #aaa; padding: 2rem; font-size: 14px; }
   .link { color: #534AB7; text-decoration: none; font-size: 13px; }
   .link:hover { text-decoration: underline; }
-  #auth-screen { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 999; }
-  .auth-box { background: white; padding: 2rem; border-radius: 12px; width: 320px; text-align: center; }
-  .auth-box h2 { margin-bottom: 1rem; font-size: 1.1rem; }
-  .auth-box input { margin-bottom: 1rem; }
+  #loading-screen { position: fixed; inset: 0; background: #1a1a2e; display: flex; align-items: center; justify-content: center; z-index: 999; flex-direction: column; gap: 16px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid #534AB7; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: white; font-size: 14px; }
+  .conn-error { background: #fcebeb; color: #501313; padding: 10px 16px; border-radius: 8px; font-size: 13px; text-align: center; max-width: 280px; }
+  .retry-btn { margin-top: 10px; padding: 7px 18px; background: #534AB7; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
 </style>
 </head>
 <body>
 
-<div id="auth-screen">
-  <div class="auth-box">
-    <h2>My AI Platform</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:1rem;">Enter your secret key to continue</p>
-    <input type="password" id="auth-input" placeholder="Secret key..." />
-    <br>
-    <button class="btn btn-primary" style="width:100%" onclick="doAuth()">Enter</button>
-    <p id="auth-error" style="color:#e24b4a;font-size:12px;margin-top:8px;"></p>
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">Connecting to backend...</div>
+  <div id="load-error" style="display:none">
+    <div class="conn-error">
+      Backend is waking up. This can take 30 seconds on a free Space.
+      <br><br>
+      <button class="retry-btn" onclick="connectBackend()">Retry</button>
+    </div>
   </div>
 </div>
 
@@ -70,22 +73,25 @@
 </header>
 
 <nav>
-  <button class="active" onclick="showPage('dashboard', this)">Dashboard</button>
-  <button onclick="showPage('train', this)">Train</button>
-  <button onclick="showPage('runs', this)">Runs</button>
-  <button onclick="showPage('models', this)">Models</button>
+  <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+  <button onclick="showPage('train',this)">Train</button>
+  <button onclick="showPage('runs',this)">Runs</button>
+  <button onclick="showPage('models',this)">Models</button>
 </nav>
 
 <div id="dashboard" class="page active">
-  <div class="metric-grid" id="metrics-grid">
-    <div class="metric"><div class="metric-value" id="m-runs">...</div><div class="metric-label">Total runs</div></div>
-    <div class="metric"><div class="metric-value" id="m-complete">...</div><div class="metric-label">Completed</div></div>
-    <div class="metric"><div class="metric-value" id="m-training">...</div><div class="metric-label">Training now</div></div>
-    <div class="metric"><div class="metric-value" id="m-failed">...</div><div class="metric-label">Failed</div></div>
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-value" id="m-runs">0</div><div class="metric-label">Total runs</div></div>
+    <div class="metric"><div class="metric-value" id="m-complete">0</div><div class="metric-label">Completed</div></div>
+    <div class="metric"><div class="metric-value" id="m-training">0</div><div class="metric-label">Training now</div></div>
+    <div class="metric"><div class="metric-value" id="m-failed">0</div><div class="metric-label">Failed</div></div>
   </div>
   <div class="card" style="margin-top:1rem">
-    <h2>Recent runs</h2>
-    <div id="recent-runs"><div class="empty">Loading...</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="margin:0">Recent runs</h2>
+      <button class="btn-sm" onclick="loadDashboard()">Refresh</button>
+    </div>
+    <div id="recent-runs"><div class="empty">No runs yet</div></div>
   </div>
 </div>
 
@@ -93,7 +99,7 @@
   <div class="card">
     <h2>Start a new training run</h2>
     <label>Run name</label>
-    <input type="text" id="run-name" placeholder="e.g. student-predictor-v2" />
+    <input type="text" id="run-name" placeholder="e.g. student-predictor-v1" />
     <label>Dataset repo ID</label>
     <input type="text" id="dataset-repo" placeholder="e.g. Emalawi19/my-first-dataset" />
     <label>Model type</label>
@@ -101,7 +107,6 @@
       <option value="random_forest">Random Forest</option>
       <option value="logistic_regression">Logistic Regression</option>
     </select>
-    <br>
     <button class="btn btn-primary" onclick="triggerTraining()">Start training</button>
     <div id="train-alert"></div>
   </div>
@@ -109,42 +114,50 @@
 
 <div id="runs" class="page">
   <div class="card">
-    <h2>All training runs</h2>
-    <div id="all-runs"><div class="empty">Loading...</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="margin:0">All training runs</h2>
+      <button class="btn-sm" onclick="loadRuns()">Refresh</button>
+    </div>
+    <div id="all-runs"><div class="empty">No runs yet</div></div>
   </div>
-  <button class="btn btn-primary" onclick="loadRuns()" style="margin-top:0">Refresh</button>
-  <div class="card" style="margin-top:1rem">
-    <h2>Live training logs</h2>
-    <div id="log-box" class="log-box">Logs will appear here when training is active...</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0">Live training logs</h2>
+      <span id="training-indicator" style="font-size:12px;color:#888">Idle</span>
+    </div>
+    <div id="log-box" class="log-box">Waiting for training activity...</div>
   </div>
 </div>
 
 <div id="models" class="page">
   <div class="card">
-    <h2>Trained models</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:1rem">Models that completed training are saved to your Hugging Face Hub.</p>
-    <div id="models-list"><div class="empty">Loading...</div></div>
+    <h2>Completed models</h2>
+    <p style="font-size:13px;color:#888;margin-bottom:1rem">All models are saved to your Hugging Face Hub automatically.</p>
+    <div id="models-list"><div class="empty">No completed models yet</div></div>
   </div>
 </div>
 
 <script>
 const BACKEND = "https://emalawi19-my-platform-backend.hf.space";
-let SECRET = "";
-let logInterval = null;
+const TRAINER  = "https://emalawi19-my-platform-trainer.hf.space";
 
-function doAuth() {
-  const val = document.getElementById("auth-input").value.trim();
-  if (!val) return;
-  SECRET = val;
-  fetch(`${BACKEND}/health`)
+function connectBackend() {
+  document.getElementById("load-error").style.display = "none";
+  document.querySelector(".loading-text").textContent = "Connecting to backend...";
+  document.querySelector(".spinner").style.display = "block";
+  fetch(BACKEND + "/health")
     .then(r => r.json())
-    .then(() => {
-      document.getElementById("auth-screen").style.display = "none";
-      loadDashboard();
-      startLogPolling();
+    .then(data => {
+      if (data.status === "healthy") {
+        document.getElementById("loading-screen").style.display = "none";
+        loadDashboard();
+        startPolling();
+      }
     })
     .catch(() => {
-      document.getElementById("auth-error").textContent = "Cannot reach backend. Check your URL.";
+      document.querySelector(".spinner").style.display = "none";
+      document.querySelector(".loading-text").textContent = "Could not connect.";
+      document.getElementById("load-error").style.display = "block";
     });
 }
 
@@ -163,7 +176,7 @@ function statusBadge(s) {
 }
 
 function loadDashboard() {
-  fetch(`${BACKEND}/runs`, { headers: { "x-secret-key": SECRET } })
+  fetch(BACKEND + "/runs")
     .then(r => r.json())
     .then(data => {
       const runs = data.runs || [];
@@ -172,64 +185,56 @@ function loadDashboard() {
       document.getElementById("m-training").textContent = runs.filter(r => r.status === "training").length;
       document.getElementById("m-failed").textContent = runs.filter(r => r.status === "failed").length;
       const recent = runs.slice(0, 5);
-      if (recent.length === 0) {
-        document.getElementById("recent-runs").innerHTML = '<div class="empty">No runs yet. Go to Train to start one.</div>';
-        return;
-      }
-      document.getElementById("recent-runs").innerHTML = recent.map(r => `
-        <div class="run-row">
-          <div>
-            <div class="run-name">${r.name}</div>
-            <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at}</div>
-          </div>
-          ${statusBadge(r.status)}
-        </div>
-      `).join("");
-    });
+      document.getElementById("recent-runs").innerHTML = recent.length === 0
+        ? '<div class="empty">No runs yet. Go to Train tab to start one.</div>'
+        : recent.map(r => `
+            <div class="run-row">
+              <div>
+                <div class="run-name">${r.name}</div>
+                <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
+                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
+              </div>
+              ${statusBadge(r.status)}
+            </div>`).join("");
+    }).catch(() => {});
 }
 
 function loadRuns() {
-  fetch(`${BACKEND}/runs`, { headers: { "x-secret-key": SECRET } })
+  fetch(BACKEND + "/runs")
     .then(r => r.json())
     .then(data => {
       const runs = data.runs || [];
-      if (runs.length === 0) {
-        document.getElementById("all-runs").innerHTML = '<div class="empty">No runs yet.</div>';
-        return;
-      }
-      document.getElementById("all-runs").innerHTML = runs.map(r => `
-        <div class="run-row">
-          <div>
-            <div class="run-name">${r.name}</div>
-            <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at}</div>
-            ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View model →</a>` : ""}
-          </div>
-          ${statusBadge(r.status)}
-        </div>
-      `).join("");
-    });
+      document.getElementById("all-runs").innerHTML = runs.length === 0
+        ? '<div class="empty">No runs yet.</div>'
+        : runs.map(r => `
+            <div class="run-row">
+              <div>
+                <div class="run-name">${r.name}</div>
+                <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
+                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
+              </div>
+              ${statusBadge(r.status)}
+            </div>`).join("");
+    }).catch(() => {});
 }
 
 function loadModels() {
-  fetch(`${BACKEND}/runs`, { headers: { "x-secret-key": SECRET } })
+  fetch(BACKEND + "/runs")
     .then(r => r.json())
     .then(data => {
       const models = (data.runs || []).filter(r => r.status === "complete");
-      if (models.length === 0) {
-        document.getElementById("models-list").innerHTML = '<div class="empty">No completed models yet.</div>';
-        return;
-      }
-      document.getElementById("models-list").innerHTML = models.map(r => `
-        <div class="run-row">
-          <div>
-            <div class="run-name">${r.name}</div>
-            <div class="run-meta">Trained on: ${r.dataset} &middot; ${r.created_at}</div>
-            ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">Open on HF Hub →</a>` : ""}
-          </div>
-          <span class="status-badge status-complete">complete</span>
-        </div>
-      `).join("");
-    });
+      document.getElementById("models-list").innerHTML = models.length === 0
+        ? '<div class="empty">No completed models yet.</div>'
+        : models.map(r => `
+            <div class="run-row">
+              <div>
+                <div class="run-name">${r.name}</div>
+                <div class="run-meta">Dataset: ${r.dataset} &middot; ${r.created_at || ""}</div>
+                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">Open on HF Hub →</a>` : ""}
+              </div>
+              <span class="status-badge status-complete">complete</span>
+            </div>`).join("");
+    }).catch(() => {});
 }
 
 function triggerTraining() {
@@ -237,47 +242,53 @@ function triggerTraining() {
   const dataset = document.getElementById("dataset-repo").value.trim();
   const model_type = document.getElementById("model-type").value;
   const alertEl = document.getElementById("train-alert");
-
   if (!name || !dataset) {
     alertEl.innerHTML = '<div class="alert alert-error">Please fill in all fields.</div>';
     return;
   }
-
-  alertEl.innerHTML = '<div class="alert alert-info">Sending request...</div>';
-
-  fetch(`${BACKEND}/trigger-training`, {
+  alertEl.innerHTML = '<div class="alert alert-info">Sending request to trainer...</div>';
+  fetch(BACKEND + "/trigger-training", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-secret-key": SECRET },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, dataset, model_type })
   })
     .then(r => r.json())
     .then(data => {
-      alertEl.innerHTML = `<div class="alert alert-success">Training started! Run ID: ${data.run_id}. Go to Runs tab to monitor.</div>`;
+      alertEl.innerHTML = `<div class="alert alert-success">Training started! Run ID: ${data.run_id}. Check the Runs tab.</div>`;
       document.getElementById("run-name").value = "";
       document.getElementById("dataset-repo").value = "";
+      loadDashboard();
     })
     .catch(e => {
       alertEl.innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
     });
 }
 
-function startLogPolling() {
-  const TRAINER = "https://emalawi19-my-platform-trainer.hf.space";
+function startPolling() {
   setInterval(() => {
-    fetch(`${TRAINER}/logs`, { headers: { "x-secret-key": SECRET } })
+    fetch(TRAINER + "/logs")
       .then(r => r.json())
       .then(data => {
+        const box = document.getElementById("log-box");
+        const ind = document.getElementById("training-indicator");
         if (data.logs && data.logs.length > 0) {
-          document.getElementById("log-box").textContent = data.logs.join("\n");
+          box.textContent = data.logs.join("\n");
+          box.scrollTop = box.scrollHeight;
+        }
+        if (data.is_training) {
+          ind.textContent = "Training in progress...";
+          ind.style.color = "#185FA5";
+        } else {
+          ind.textContent = "Idle";
+          ind.style.color = "#888";
+          loadDashboard();
         }
       })
       .catch(() => {});
   }, 5000);
 }
 
-document.getElementById("auth-input").addEventListener("keydown", e => {
-  if (e.key === "Enter") doAuth();
-});
+connectBackend();
 </script>
 </body>
-  </html>
+   </html>
