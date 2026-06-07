@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -44,7 +44,7 @@
   .link { color: #534AB7; text-decoration: none; font-size: 13px; }
   .link:hover { text-decoration: underline; }
   .status-bar { background: #1a1a2e; color: #9FE1CB; font-size: 12px; padding: 4px 2rem; display: flex; align-items: center; gap: 8px; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #9FE1CB; display: inline-block; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; display: inline-block; }
 </style>
 </head>
 <body>
@@ -128,8 +128,9 @@
 </div>
 
 <script>
-const BACKEND = "https://emalawi19-my-platform-backend.hf.space";
-const TRAINER  = "https://emalawi19-my-platform-trainer.hf.space";
+const PROXY    = "https://ai-platform-proxy.emalawi19.workers.dev";
+const BACKEND  = PROXY;
+const TRAINER  = PROXY + "/trainer";
 
 function setStatus(text, ok) {
   document.getElementById("status-text").textContent = text;
@@ -174,7 +175,7 @@ function loadDashboard() {
           </div>`).join("");
   })
   .catch(() => {
-    setStatus("Backend offline — retrying...", false);
+    setStatus("Backend offline", false);
     document.getElementById("recent-runs").innerHTML = '<div class="empty">Could not load. Click Refresh.</div>';
   });
 }
@@ -273,4 +274,4 @@ loadDashboard();
 startPolling();
 </script>
 </body>
-                                                                      </html>
+                                                                                                                </html>
