@@ -48,20 +48,20 @@
   .spinner { width: 36px; height: 36px; border: 3px solid #534AB7; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { color: white; font-size: 14px; }
-  .conn-error { background: #fcebeb; color: #501313; padding: 10px 16px; border-radius: 8px; font-size: 13px; text-align: center; max-width: 280px; }
+  .conn-error { background: #fcebeb; color: #501313; padding: 10px 16px; border-radius: 8px; font-size: 13px; text-align: center; max-width: 300px; }
   .retry-btn { margin-top: 10px; padding: 7px 18px; background: #534AB7; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
 </style>
 </head>
 <body>
 
 <div id="loading-screen">
-  <div class="spinner"></div>
-  <div class="loading-text">Connecting to backend...</div>
+  <div class="spinner" id="spinner"></div>
+  <div class="loading-text" id="loading-text">Connecting to backend...</div>
   <div id="load-error" style="display:none">
     <div class="conn-error">
-      Backend is waking up. This can take 30 seconds on a free Space.
+      Backend is waking up. This can take 30 seconds.
       <br><br>
-      <button class="retry-btn" onclick="connectBackend()">Retry</button>
+      <button class="retry-btn" onclick="connectBackend()">Retry now</button>
     </div>
   </div>
 </div>
@@ -132,7 +132,9 @@
 <div id="models" class="page">
   <div class="card">
     <h2>Completed models</h2>
-    <p style="font-size:13px;color:#888;margin-bottom:1rem">All models are saved to your Hugging Face Hub automatically.</p>
+    <p style="font-size:13px;color:#888;margin-bottom:1rem">
+      All models are saved to your Hugging Face Hub automatically.
+    </p>
     <div id="models-list"><div class="empty">No completed models yet</div></div>
   </div>
 </div>
@@ -140,44 +142,52 @@
 <script>
 const BACKEND = "https://emalawi19-my-platform-backend.hf.space";
 const TRAINER  = "https://emalawi19-my-platform-trainer.hf.space";
+let retryCount = 0;
 
 function connectBackend() {
+  retryCount = 0;
   document.getElementById("load-error").style.display = "none";
-  const loadingText = document.querySelector(".loading-text");
-  loadingText.textContent = "Connecting to backend...";
-  document.querySelector(".spinner").style.display = "block";
-  
-  fetch(BACKEND + "/health")
-    .then(async (response) => {
-      // Fetch only rejects on network failures, not 404s or 500s. 
-      // We must check if the response is OK.
-      if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.status === "healthy") {
-        document.getElementById("loading-screen").style.display = "none";
-        loadDashboard();
-        startPolling();
-      } else {
-        throw new Error("Backend connected, but status is not healthy.");
-      }
-    })
-    .catch((error) => {
-      console.error("Connection Failed:", error);
-      document.querySelector(".spinner").style.display = "none";
-      loadingText.textContent = "Connection Failed.";
-      // Inject the actual error message into the DOM
-      document.querySelector(".conn-error").innerHTML = `
-        <strong>Error:</strong> ${error.message} <br><br>
-        Check the browser console (F12) for more details.
-        <br><br>
-        <button class="retry-btn" onclick="connectBackend()">Retry</button>
-      `;
-      document.getElementById("load-error").style.display = "block";
-    });
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("loading-text").textContent = "Connecting to backend...";
+  tryConnect();
+}
+
+function tryConnect() {
+  fetch(BACKEND + "/health", {
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    headers: { "Accept": "application/json" }
+  })
+  .then(r => {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  })
+  .then(data => {
+    if (data.status === "healthy") {
+      document.getElementById("loading-screen").style.display = "none";
+      loadDashboard();
+      startPolling();
+    } else {
+      scheduleRetry();
+    }
+  })
+  .catch(() => {
+    scheduleRetry();
+  });
+}
+
+function scheduleRetry() {
+  retryCount++;
+  if (retryCount <= 5) {
+    document.getElementById("loading-text").textContent =
+      "Waking up Space... attempt " + retryCount + " of 5";
+    setTimeout(tryConnect, 10000);
+  } else {
+    document.getElementById("spinner").style.display = "none";
+    document.getElementById("loading-text").textContent = "Could not connect.";
+    document.getElementById("load-error").style.display = "block";
+  }
 }
 
 function showPage(id, btn) {
@@ -195,65 +205,77 @@ function statusBadge(s) {
 }
 
 function loadDashboard() {
-  fetch(BACKEND + "/runs")
-    .then(r => r.json())
-    .then(data => {
-      const runs = data.runs || [];
-      document.getElementById("m-runs").textContent = runs.length;
-      document.getElementById("m-complete").textContent = runs.filter(r => r.status === "complete").length;
-      document.getElementById("m-training").textContent = runs.filter(r => r.status === "training").length;
-      document.getElementById("m-failed").textContent = runs.filter(r => r.status === "failed").length;
-      const recent = runs.slice(0, 5);
-      document.getElementById("recent-runs").innerHTML = recent.length === 0
-        ? '<div class="empty">No runs yet. Go to Train tab to start one.</div>'
-        : recent.map(r => `
-            <div class="run-row">
-              <div>
-                <div class="run-name">${r.name}</div>
-                <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
-                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
-              </div>
-              ${statusBadge(r.status)}
-            </div>`).join("");
-    }).catch(() => {});
+  fetch(BACKEND + "/runs", {
+    mode: "cors",
+    cache: "no-cache",
+    headers: { "Accept": "application/json" }
+  })
+  .then(r => r.json())
+  .then(data => {
+    const runs = data.runs || [];
+    document.getElementById("m-runs").textContent = runs.length;
+    document.getElementById("m-complete").textContent = runs.filter(r => r.status === "complete").length;
+    document.getElementById("m-training").textContent = runs.filter(r => r.status === "training").length;
+    document.getElementById("m-failed").textContent = runs.filter(r => r.status === "failed").length;
+    const recent = runs.slice(0, 5);
+    document.getElementById("recent-runs").innerHTML = recent.length === 0
+      ? '<div class="empty">No runs yet. Go to Train tab to start one.</div>'
+      : recent.map(r => `
+          <div class="run-row">
+            <div>
+              <div class="run-name">${r.name}</div>
+              <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
+              ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
+            </div>
+            ${statusBadge(r.status)}
+          </div>`).join("");
+  }).catch(() => {});
 }
 
 function loadRuns() {
-  fetch(BACKEND + "/runs")
-    .then(r => r.json())
-    .then(data => {
-      const runs = data.runs || [];
-      document.getElementById("all-runs").innerHTML = runs.length === 0
-        ? '<div class="empty">No runs yet.</div>'
-        : runs.map(r => `
-            <div class="run-row">
-              <div>
-                <div class="run-name">${r.name}</div>
-                <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
-                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
-              </div>
-              ${statusBadge(r.status)}
-            </div>`).join("");
-    }).catch(() => {});
+  fetch(BACKEND + "/runs", {
+    mode: "cors",
+    cache: "no-cache",
+    headers: { "Accept": "application/json" }
+  })
+  .then(r => r.json())
+  .then(data => {
+    const runs = data.runs || [];
+    document.getElementById("all-runs").innerHTML = runs.length === 0
+      ? '<div class="empty">No runs yet.</div>'
+      : runs.map(r => `
+          <div class="run-row">
+            <div>
+              <div class="run-name">${r.name}</div>
+              <div class="run-meta">${r.dataset} &middot; ${r.model_type} &middot; ${r.created_at || ""}</div>
+              ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">View on HF Hub →</a>` : ""}
+            </div>
+            ${statusBadge(r.status)}
+          </div>`).join("");
+  }).catch(() => {});
 }
 
 function loadModels() {
-  fetch(BACKEND + "/runs")
-    .then(r => r.json())
-    .then(data => {
-      const models = (data.runs || []).filter(r => r.status === "complete");
-      document.getElementById("models-list").innerHTML = models.length === 0
-        ? '<div class="empty">No completed models yet.</div>'
-        : models.map(r => `
-            <div class="run-row">
-              <div>
-                <div class="run-name">${r.name}</div>
-                <div class="run-meta">Dataset: ${r.dataset} &middot; ${r.created_at || ""}</div>
-                ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">Open on HF Hub →</a>` : ""}
-              </div>
-              <span class="status-badge status-complete">complete</span>
-            </div>`).join("");
-    }).catch(() => {});
+  fetch(BACKEND + "/runs", {
+    mode: "cors",
+    cache: "no-cache",
+    headers: { "Accept": "application/json" }
+  })
+  .then(r => r.json())
+  .then(data => {
+    const models = (data.runs || []).filter(r => r.status === "complete");
+    document.getElementById("models-list").innerHTML = models.length === 0
+      ? '<div class="empty">No completed models yet.</div>'
+      : models.map(r => `
+          <div class="run-row">
+            <div>
+              <div class="run-name">${r.name}</div>
+              <div class="run-meta">Dataset: ${r.dataset} &middot; ${r.created_at || ""}</div>
+              ${r.space_url ? `<a class="link" href="${r.space_url}" target="_blank">Open on HF Hub →</a>` : ""}
+            </div>
+            <span class="status-badge status-complete">complete</span>
+          </div>`).join("");
+  }).catch(() => {});
 }
 
 function triggerTraining() {
@@ -268,46 +290,52 @@ function triggerTraining() {
   alertEl.innerHTML = '<div class="alert alert-info">Sending request to trainer...</div>';
   fetch(BACKEND + "/trigger-training", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    cache: "no-cache",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({ name, dataset, model_type })
   })
-    .then(r => r.json())
-    .then(data => {
-      alertEl.innerHTML = `<div class="alert alert-success">Training started! Run ID: ${data.run_id}. Check the Runs tab.</div>`;
-      document.getElementById("run-name").value = "";
-      document.getElementById("dataset-repo").value = "";
-      loadDashboard();
-    })
-    .catch(e => {
-      alertEl.innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
-    });
+  .then(r => r.json())
+  .then(data => {
+    alertEl.innerHTML = `<div class="alert alert-success">Training started! Run ID: ${data.run_id}. Check the Runs tab.</div>`;
+    document.getElementById("run-name").value = "";
+    document.getElementById("dataset-repo").value = "";
+    loadDashboard();
+  })
+  .catch(e => {
+    alertEl.innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
+  });
 }
 
 function startPolling() {
   setInterval(() => {
-    fetch(TRAINER + "/logs")
-      .then(r => r.json())
-      .then(data => {
-        const box = document.getElementById("log-box");
-        const ind = document.getElementById("training-indicator");
-        if (data.logs && data.logs.length > 0) {
-          box.textContent = data.logs.join("\n");
-          box.scrollTop = box.scrollHeight;
-        }
-        if (data.is_training) {
-          ind.textContent = "Training in progress...";
-          ind.style.color = "#185FA5";
-        } else {
-          ind.textContent = "Idle";
-          ind.style.color = "#888";
-          loadDashboard();
-        }
-      })
-      .catch(() => {});
+    fetch(TRAINER + "/logs", {
+      mode: "cors",
+      cache: "no-cache",
+      headers: { "Accept": "application/json" }
+    })
+    .then(r => r.json())
+    .then(data => {
+      const box = document.getElementById("log-box");
+      const ind = document.getElementById("training-indicator");
+      if (data.logs && data.logs.length > 0) {
+        box.textContent = data.logs.join("\n");
+        box.scrollTop = box.scrollHeight;
+      }
+      if (data.is_training) {
+        ind.textContent = "Training in progress...";
+        ind.style.color = "#185FA5";
+      } else {
+        ind.textContent = "Idle";
+        ind.style.color = "#888";
+        loadDashboard();
+      }
+    })
+    .catch(() => {});
   }, 5000);
 }
 
 connectBackend();
 </script>
 </body>
-   </html>
+                                 </html>
